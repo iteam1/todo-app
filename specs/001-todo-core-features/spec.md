@@ -130,6 +130,7 @@ verify the task is gone from every context.
 - **FR-013**: System MUST display contextual empty-state messages when no tasks match the current view (no tasks yet, no active tasks, no completed tasks).
 - **FR-014**: System MUST be fully functional on viewports from 320 px width and above.
 - **FR-015**: System MUST prevent creation of tasks with blank or whitespace-only descriptions.
+- **FR-016**: System MUST ensure all actions (create, complete, delete, filter) are fully operable using a keyboard alone, with visible focus indicators on all interactive elements.
 
 ### Key Entities
 
@@ -146,6 +147,7 @@ verify the task is gone from every context.
 - **SC-005**: Users can complete the full task-management workflow (create → complete → filter → delete) without encountering an unhandled error.
 - **SC-006**: Filter changes update the displayed list within 1 second.
 - **SC-007**: The app handles corrupted or missing stored data gracefully — starting from a clean empty state with a user-visible notification rather than a crash or blank screen.
+- **SC-008**: The app renders and remains fully interactive with up to 100 tasks without any perceptible delay.
 
 ## Assumptions
 
@@ -154,3 +156,13 @@ verify the task is gone from every context.
 - Bulk operations (e.g., "delete all completed") are out of scope.
 - A single confirmation step before deletion is sufficient.
 - The app is a single-page experience; multi-page routing is out of scope.
+- Editing an existing task's text description is explicitly out of scope for this version; users must delete and recreate a task to change its text.
+- The app is designed for personal use with a maximum of 100 tasks; no pagination or list virtualisation is required.
+
+## Clarifications
+
+### Session 2026-03-22
+
+- Q: Should users be able to edit the text of an existing task after it has been created? → A: Out of scope — editing is deferred to a future version.
+- Q: Should the app meet any accessibility standard for keyboard navigation and screen reader support? → A: Basic keyboard accessibility — all actions operable without a mouse.
+- Q: What is the maximum number of tasks the app should support before performance degrades? → A: Up to 100 tasks.
