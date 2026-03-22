@@ -15,6 +15,7 @@ export function TodoApp() {
     addTodo,
     toggleTodo,
     deleteTodo,
+    editTodo,
     setFilter,
   } = useTodos();
 
@@ -69,6 +70,7 @@ export function TodoApp() {
           activeFilter={activeFilter}
           onToggle={toggleTodo}
           onDelete={deleteTodo}
+          editTodo={editTodo}
         />
       </div>
     </main>

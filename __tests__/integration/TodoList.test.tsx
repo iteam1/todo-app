@@ -18,6 +18,7 @@ describe('TodoList', () => {
         activeFilter="all"
         onToggle={jest.fn()}
         onDelete={jest.fn()}
+        editTodo={jest.fn()}
       />,
     );
     expect(screen.getByRole('list')).toBeInTheDocument();
@@ -29,23 +30,23 @@ describe('TodoList', () => {
       mockTodo,
       { ...mockTodo, id: '2', text: 'Walk the dog' },
     ];
-    render(<TodoList todos={todos} activeFilter="all" onToggle={jest.fn()} onDelete={jest.fn()} />);
+    render(<TodoList todos={todos} activeFilter="all" onToggle={jest.fn()} onDelete={jest.fn()} editTodo={jest.fn()} />);
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
   it('renders empty-state message when todos is empty and filter is "all"', () => {
-    render(<TodoList todos={[]} activeFilter="all" onToggle={jest.fn()} onDelete={jest.fn()} />);
+    render(<TodoList todos={[]} activeFilter="all" onToggle={jest.fn()} onDelete={jest.fn()} editTodo={jest.fn()} />);
     expect(screen.getByText('No tasks yet. Add one above.')).toBeInTheDocument();
   });
 
   it('renders "No active tasks." when filter is "active" and todos is empty', () => {
-    render(<TodoList todos={[]} activeFilter="active" onToggle={jest.fn()} onDelete={jest.fn()} />);
+    render(<TodoList todos={[]} activeFilter="active" onToggle={jest.fn()} onDelete={jest.fn()} editTodo={jest.fn()} />);
     expect(screen.getByText('No active tasks.')).toBeInTheDocument();
   });
 
   it('renders "No completed tasks." when filter is "completed" and todos is empty', () => {
     render(
-      <TodoList todos={[]} activeFilter="completed" onToggle={jest.fn()} onDelete={jest.fn()} />,
+      <TodoList todos={[]} activeFilter="completed" onToggle={jest.fn()} onDelete={jest.fn()} editTodo={jest.fn()} />,
     );
     expect(screen.getByText('No completed tasks.')).toBeInTheDocument();
   });

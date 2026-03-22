@@ -8,6 +8,7 @@ type Action =
   | { type: 'ADD_TODO'; text: string }
   | { type: 'TOGGLE_TODO'; id: string }
   | { type: 'DELETE_TODO'; id: string }
+  | { type: 'EDIT_TODO'; id: string; text: string }
   | { type: 'SET_FILTER'; filter: FilterOption };
 
 interface State {
@@ -50,6 +51,14 @@ function reducer(state: State, action: Action): State {
     }
     case 'DELETE_TODO': {
       return { ...state, todos: state.todos.filter((t) => t.id !== action.id) };
+    }
+    case 'EDIT_TODO': {
+      return {
+        ...state,
+        todos: state.todos.map((todo) =>
+          todo.id === action.id ? { ...todo, text: action.text } : todo,
+        ),
+      };
     }
     case 'SET_FILTER': {
       return { ...state, activeFilter: action.filter };
@@ -118,6 +127,10 @@ export function useTodos() {
     dispatch({ type: 'SET_FILTER', filter });
   }, []);
 
+  const editTodo = useCallback((id: string, text: string) => {
+    dispatch({ type: 'EDIT_TODO', id, text });
+  }, []);
+
   const filteredTodos = getFilteredTodos(state.todos, state.activeFilter);
 
   return {
@@ -129,6 +142,7 @@ export function useTodos() {
     addTodo,
     toggleTodo,
     deleteTodo,
+    editTodo,
     setFilter,
   };
 }

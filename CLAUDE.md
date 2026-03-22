@@ -3,6 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2026-03-22
 
 ## Active Technologies
+- TypeScript 5.4 (strict mode, `any` prohibited) + Next.js 14 (App Router), React 18, Tailwind CSS 3 (002-edit-task-text)
+- localStorage — existing `useTodos` persistence pipeline (auto-persist on state change) (002-edit-task-text)
 
 - TypeScript 5.x (strict mode — `any` prohibited except verified external-data boundaries) + Next.js 14+, React 18+, Tailwind CSS 3+ (001-todo-core-features)
 
@@ -23,6 +25,7 @@ npm test && npm run lint
 TypeScript 5.x (strict mode — `any` prohibited except verified external-data boundaries): Follow standard conventions
 
 ## Recent Changes
+- 002-edit-task-text: Added TypeScript 5.4 (strict mode, `any` prohibited) + Next.js 14 (App Router), React 18, Tailwind CSS 3
 
 - 001-todo-core-features: Added TypeScript 5.x (strict mode — `any` prohibited except verified external-data boundaries) + Next.js 14+, React 18+, Tailwind CSS 3+
 
