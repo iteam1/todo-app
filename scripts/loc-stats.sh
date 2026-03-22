@@ -33,21 +33,6 @@ build_prune_args() {
   printf '%s\n' "${args[@]}"
 }
 
-ext_to_type() {
-  case "$1" in
-    ts|tsx)   echo "TypeScript" ;;
-    js|jsx)   echo "JavaScript" ;;
-    css)      echo "CSS" ;;
-    json)     echo "JSON" ;;
-    md)       echo "Markdown" ;;
-    mjs|cjs)  echo "JavaScript" ;;
-    html)     echo "HTML" ;;
-    sh)       echo "Shell" ;;
-    yaml|yml) echo "YAML" ;;
-    *)        echo "Other" ;;
-  esac
-}
-
 count_lines() {
   local file="$1"
   # wc -l counts newlines; add 1 if file doesn't end with newline (non-empty)
@@ -77,7 +62,7 @@ for dir in "${SCAN_DIRS[@]}"; do
   while IFS= read -r -d '' file; do
     ext="${file##*.}"
     [[ "$ext" == "$file" ]] && ext=""   # no extension
-    type=$(ext_to_type "$ext")
+    type="${ext:-(none)}"
 
     lines=$(count_lines "$file")
 
@@ -92,7 +77,7 @@ done
 while IFS= read -r -d '' file; do
   ext="${file##*.}"
   [[ "$ext" == "$file" ]] && ext=""
-  type=$(ext_to_type "$ext")
+  type="${ext:-(none)}"
 
   lines=$(count_lines "$file")
 
@@ -111,7 +96,7 @@ COL_LINES=10
 divider=$(printf '%-*s' $((COL_TYPE + COL_FILES + COL_LINES + 6)) '' | tr ' ' '-')
 
 printf "\n  Lines of Code — %s\n\n" "$ROOT"
-printf "  %-*s  %*s  %*s\n" $COL_TYPE "Type" $COL_FILES "Files" $COL_LINES "Lines"
+printf "  %-*s  %*s  %*s\n" $COL_TYPE "Ext" $COL_FILES "Files" $COL_LINES "Lines"
 printf "  %s\n" "$divider"
 
 # sort types alphabetically
