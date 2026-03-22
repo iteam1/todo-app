@@ -78,4 +78,36 @@ test.describe('Edit Task', () => {
     await page.reload();
     await expect(page.getByText('Original text')).toBeVisible();
   });
+
+  // T012: Responsive — touch target and no overflow at mobile viewport
+  test('Edit button meets 44×44px touch target at 320px viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+
+    const input = page.getByRole('textbox', { name: /new task/i });
+    await input.fill('Mobile task');
+    await input.press('Enter');
+
+    const editBtn = page.getByRole('button', { name: /edit task/i });
+    const box = await editBtn.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+
+    // No horizontal overflow
+    const overflow = await page.evaluate(() => document.body.scrollWidth > document.body.clientWidth);
+    expect(overflow).toBe(false);
+  });
+
+  test('inline input has no horizontal overflow at 320px viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+
+    const input = page.getByRole('textbox', { name: /new task/i });
+    await input.fill('Mobile task');
+    await input.press('Enter');
+
+    await page.getByRole('button', { name: /edit task/i }).click();
+
+    const overflow = await page.evaluate(() => document.body.scrollWidth > document.body.clientWidth);
+    expect(overflow).toBe(false);
+  });
 });
