@@ -1,0 +1,1 @@
+Declare principles for  clean code, simple UX, responsive design and minimal dependencies. Testing (including unit tests, integration tests, end-to-end tests) is mandatory. The project use the next.js, react, tailwind.
