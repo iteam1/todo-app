@@ -127,6 +127,49 @@ describe('useTodos — SET_FILTER and filteredTodos', () => {
   });
 });
 
+describe('useTodos — EDIT_TODO', () => {
+  it('editTodo is present on hook return value', () => {
+    const { result } = renderHook(() => useTodos());
+    expect(typeof result.current.editTodo).toBe('function');
+  });
+
+  it('updates matching todo text', () => {
+    const { result } = renderHook(() => useTodos());
+    act(() => { result.current.addTodo('Original text'); });
+    const id = result.current.todos[0]!.id;
+    act(() => { result.current.editTodo(id, 'Updated text'); });
+    expect(result.current.todos[0]!.text).toBe('Updated text');
+  });
+
+  it('leaves all other fields unchanged (status/createdAt/completedAt)', () => {
+    const { result } = renderHook(() => useTodos());
+    act(() => { result.current.addTodo('Task'); });
+    const before = result.current.todos[0]!;
+    act(() => { result.current.editTodo(before.id, 'New text'); });
+    const after = result.current.todos[0]!;
+    expect(after.status).toBe(before.status);
+    expect(after.createdAt).toBe(before.createdAt);
+    expect(after.completedAt).toBe(before.completedAt);
+  });
+
+  it('is a no-op when id not found', () => {
+    const { result } = renderHook(() => useTodos());
+    act(() => { result.current.addTodo('Task'); });
+    const before = result.current.todos[0]!.text;
+    act(() => { result.current.editTodo('nonexistent-id', 'New text'); });
+    expect(result.current.todos[0]!.text).toBe(before);
+  });
+
+  it('persists updated text to localStorage', () => {
+    const { result } = renderHook(() => useTodos());
+    act(() => { result.current.addTodo('Task'); });
+    const id = result.current.todos[0]!.id;
+    act(() => { result.current.editTodo(id, 'Persisted text'); });
+    const stored = JSON.parse(localStorage.getItem('todos') ?? '[]') as unknown[];
+    expect((stored[0] as { text: string }).text).toBe('Persisted text');
+  });
+});
+
 describe('useTodos — DELETE_TODO', () => {
   it('removes item with matching id', () => {
     const { result } = renderHook(() => useTodos());
