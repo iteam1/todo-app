@@ -35,4 +35,19 @@ test.describe('Edit Task', () => {
     await page.reload();
     await expect(page.getByText('Persisted text')).toBeVisible();
   });
+
+  // US2: Cancel Edit with Escape
+  test('add task → click Edit → modify text → press Escape → original text restored', async ({ page }) => {
+    const input = page.getByRole('textbox', { name: /new task/i });
+    await input.fill('Original text');
+    await input.press('Enter');
+
+    await page.getByRole('button', { name: /edit task/i }).click();
+    const editInput = page.getByRole('textbox').last();
+    await editInput.fill('Modified text');
+    await editInput.press('Escape');
+
+    await expect(page.getByText('Original text')).toBeVisible();
+    await expect(page.getByText('Modified text')).not.toBeVisible();
+  });
 });

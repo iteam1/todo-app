@@ -150,6 +150,58 @@ describe('TodoItem — edit (US1: activate and save)', () => {
   });
 });
 
+describe('TodoItem — edit (US2: Escape cancellation)', () => {
+  const editProps = {
+    isEditing: true,
+    onEditStart: jest.fn(),
+    onEditSave: jest.fn(),
+    onEditCancel: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('pressing Escape with modified text calls onEditCancel, not onEditSave', async () => {
+    render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    const input = screen.getByRole('textbox');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'Modified text');
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(editProps.onEditCancel).toHaveBeenCalledTimes(1);
+    expect(editProps.onEditSave).not.toHaveBeenCalled();
+  });
+
+  it('pressing Escape without changes calls onEditCancel, not onEditSave', () => {
+    render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    const input = screen.getByRole('textbox');
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(editProps.onEditCancel).toHaveBeenCalledTimes(1);
+    expect(editProps.onEditSave).not.toHaveBeenCalled();
+  });
+
+  it('editTodo is NOT called when Escape is pressed', async () => {
+    const onEditSave = jest.fn();
+    render(
+      <TodoItemComponent
+        todo={activeTodo}
+        onToggle={jest.fn()}
+        onDelete={jest.fn()}
+        {...editProps}
+        onEditSave={onEditSave}
+      />,
+    );
+    const input = screen.getByRole('textbox');
+    await userEvent.type(input, 'Changed');
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(onEditSave).not.toHaveBeenCalled();
+  });
+});
+
 describe('TodoItem — delete', () => {
   it('renders a delete button', () => {
     render(<TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} />);
