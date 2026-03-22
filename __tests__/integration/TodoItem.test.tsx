@@ -60,6 +60,96 @@ describe('TodoItem — toggle', () => {
   });
 });
 
+describe('TodoItem — edit (US1: activate and save)', () => {
+  const editProps = {
+    isEditing: false,
+    onEditStart: jest.fn(),
+    onEditSave: jest.fn(),
+    onEditCancel: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('Edit button is visible in display mode', () => {
+    render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    expect(screen.getByRole('button', { name: /edit task/i })).toBeInTheDocument();
+  });
+
+  it('clicking Edit calls onEditStart with todo.id', async () => {
+    render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /edit task/i }));
+    expect(editProps.onEditStart).toHaveBeenCalledWith('1');
+  });
+
+  it('shows input pre-filled with current text when isEditing is true', () => {
+    render(
+      <TodoItemComponent
+        todo={activeTodo}
+        onToggle={jest.fn()}
+        onDelete={jest.fn()}
+        {...editProps}
+        isEditing={true}
+      />,
+    );
+    const input = screen.getByRole('textbox');
+    expect(input).toBeInTheDocument();
+    expect((input as HTMLInputElement).value).toBe('Buy milk');
+  });
+
+  it('pressing Enter calls onEditSave with id and new text', async () => {
+    render(
+      <TodoItemComponent
+        todo={activeTodo}
+        onToggle={jest.fn()}
+        onDelete={jest.fn()}
+        {...editProps}
+        isEditing={true}
+      />,
+    );
+    const input = screen.getByRole('textbox');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'New text');
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(editProps.onEditSave).toHaveBeenCalledWith('1', 'New text');
+  });
+
+  it('blurring the input calls onEditSave', async () => {
+    render(
+      <TodoItemComponent
+        todo={activeTodo}
+        onToggle={jest.fn()}
+        onDelete={jest.fn()}
+        {...editProps}
+        isEditing={true}
+      />,
+    );
+    const input = screen.getByRole('textbox');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'Blurred text');
+    fireEvent.blur(input);
+    expect(editProps.onEditSave).toHaveBeenCalledWith('1', 'Blurred text');
+  });
+
+  it('only one item in edit mode at a time — second Edit click fires onEditStart again', async () => {
+    const { rerender } = render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /edit task/i }));
+    expect(editProps.onEditStart).toHaveBeenCalledTimes(1);
+    // Simulate parent switching edit to another item — this item goes back to display mode
+    rerender(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} isEditing={false} />,
+    );
+    expect(screen.getByRole('button', { name: /edit task/i })).toBeInTheDocument();
+  });
+});
+
 describe('TodoItem — delete', () => {
   it('renders a delete button', () => {
     render(<TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} />);
