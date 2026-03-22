@@ -50,4 +50,32 @@ test.describe('Edit Task', () => {
     await expect(page.getByText('Original text')).toBeVisible();
     await expect(page.getByText('Modified text')).not.toBeVisible();
   });
+
+  // US3: Reject Blank Save
+  test('add task → click Edit → clear text → press Enter → original text restored', async ({ page }) => {
+    const input = page.getByRole('textbox', { name: /new task/i });
+    await input.fill('Original text');
+    await input.press('Enter');
+
+    await page.getByRole('button', { name: /edit task/i }).click();
+    const editInput = page.getByRole('textbox').last();
+    await editInput.fill('');
+    await editInput.press('Enter');
+
+    await expect(page.getByText('Original text')).toBeVisible();
+  });
+
+  test('blank rejection persists on reload — original text remains', async ({ page }) => {
+    const input = page.getByRole('textbox', { name: /new task/i });
+    await input.fill('Original text');
+    await input.press('Enter');
+
+    await page.getByRole('button', { name: /edit task/i }).click();
+    const editInput = page.getByRole('textbox').last();
+    await editInput.fill('');
+    await editInput.press('Enter');
+
+    await page.reload();
+    await expect(page.getByText('Original text')).toBeVisible();
+  });
 });

@@ -202,6 +202,91 @@ describe('TodoItem — edit (US2: Escape cancellation)', () => {
   });
 });
 
+describe('TodoItem — edit (US3: blank rejection)', () => {
+  const onEditSave = jest.fn();
+  const editProps = {
+    isEditing: true,
+    onEditStart: jest.fn(),
+    onEditSave,
+    onEditCancel: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('pressing Enter with blank text calls onEditSave with empty string (parent handles rejection)', () => {
+    render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onEditSave).toHaveBeenCalledWith('1', '');
+  });
+
+  it('blurring with blank text calls onEditSave with empty string (parent handles rejection)', () => {
+    render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.blur(input);
+    expect(onEditSave).toHaveBeenCalledWith('1', '');
+  });
+
+  it('whitespace-only input is passed to onEditSave (parent trims and rejects)', () => {
+    render(
+      <TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} {...editProps} />,
+    );
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onEditSave).toHaveBeenCalledWith('1', '   ');
+  });
+
+  it('TodoList does not call editTodo when text is blank', async () => {
+    const { render: renderList } = await import('@testing-library/react');
+    const { TodoList } = await import('@/components/TodoList');
+    const editTodoMock = jest.fn();
+    const todo = activeTodo;
+    renderList(
+      <TodoList
+        todos={[todo]}
+        activeFilter="all"
+        onToggle={jest.fn()}
+        onDelete={jest.fn()}
+        editTodo={editTodoMock}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /edit task/i }));
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(editTodoMock).not.toHaveBeenCalled();
+  });
+
+  it('TodoList does not call editTodo when text is whitespace-only', async () => {
+    const { render: renderList } = await import('@testing-library/react');
+    const { TodoList } = await import('@/components/TodoList');
+    const editTodoMock = jest.fn();
+    renderList(
+      <TodoList
+        todos={[activeTodo]}
+        activeFilter="all"
+        onToggle={jest.fn()}
+        onDelete={jest.fn()}
+        editTodo={editTodoMock}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /edit task/i }));
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(editTodoMock).not.toHaveBeenCalled();
+  });
+});
+
 describe('TodoItem — delete', () => {
   it('renders a delete button', () => {
     render(<TodoItemComponent todo={activeTodo} onToggle={jest.fn()} onDelete={jest.fn()} />);
